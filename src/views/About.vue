@@ -22,9 +22,9 @@
         </div>
 
         <div class="columns">
-          <div class="columns is-multiline is-variable is-3">
+          <div class="columns is-mobile is-multiline is-variable is-3">
             <div
-              class="column  is-one-fifth-widescreen is-one-quarter-desktop is-one-third-tablet  movie-card"
+              class="column  is-one-fifth-widescreen is-one-quarter-desktop is-one-third-tablet is-one-third-mobile movie-card"
               v-for="movie in topMovieData.results"
               :key="movie.id"
             >
@@ -68,6 +68,18 @@
             </div>
           </div>
         </div>
+        <nav class="pagination" role="navigation" aria-label="pagination">
+          <a
+            class="pagination-previous"
+            title="This is the first page"
+            :disabled="previousDisabled"
+            @click="previousPage"
+            >Previous</a
+          >
+          <a class="pagination-next" @click="nextPage" :disabled="nextDisabled"
+            >Next page</a
+          >
+        </nav>
       </div>
     </div>
   </section>
@@ -84,25 +96,77 @@ export default {
       topMovieData: [],
       filterBy: "day",
       apiKey: process.env.VUE_APP_API_KEY,
+      currentPage: 1,
+      totalPages: null,
     };
   },
   mounted() {
-    axios
-      .get(
-        `https://api.themoviedb.org/3/trending/movie/${this.filterBy}?api_key=${this.apiKey}`
-      )
-      .then((response) => {
-        this.topMovieData = response.data;
-        console.log(this.topMovieData);
-      });
+    this.fetchMovies();
   },
   methods: {
+    fetchMovies() {
+      // get most popular movies
+      axios
+        .get(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${this.apiKey}&language=en-US&page=${this.currentPage}`
+          // `https://api.themoviedb.org/3/trending/movie/${this.filterBy}?api_key=${this.apiKey}&page=${this.currentPage}`
+        )
+        .then((response) => {
+          this.topMovieData = response.data;
+          this.totalPages = response.data.total_pages;
+          console.log(this.topMovieData);
+        });
+    },
+
     addMovieToFavorites(newId, newTitle, poster_path) {
       db.collection("favoriteMovies").add({
         title: newTitle,
         movieId: newId,
         poster_path: poster_path,
+        dateAdded: new Date(),
       });
+      // const query = db
+      //   .collection("favoriteMovies")
+      //   .where("movieId", "==", newId)
+      //   .get()
+      //   .then((doc) => {
+      //     if (doc.docs.length >= 2) {
+      //       console.log("this already exisits");
+      //     } else {
+      //       db.collection("favoriteMovies").add({
+      //         title: newTitle,
+      //         movieId: newId,
+      //         poster_path: poster_path,
+      //         dateAdded: new Date(),
+      //       });
+      //     }
+      //   });
+
+      console.log(newId);
+    },
+    nextPage() {
+      this.currentPage++;
+      this.fetchMovies();
+    },
+    previousPage() {
+      this.currentPage--;
+      this.fetchMovies();
+    },
+  },
+  computed: {
+    previousDisabled() {
+      if (this.currentPage == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    nextDisabled() {
+      if (this.currentPage == this.totalPages) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
   watch: {

@@ -20,9 +20,9 @@
           </div>
         </div>
 
-        <div class="columns is-multiline is-variable is-3">
+        <div class="columns is-multiline  is-mobile  is-variable is-3">
           <div
-            class="column  is-one-quarter-widescreen is-one-third-desktop is-half-tablet  movie-card"
+            class="column  is-one-quarter-widescreen is-one-third-mobile is-one-third-desktop is-half-tablet  movie-card"
             v-for="movie in movieData.results"
             :key="movie.id"
           >
@@ -74,6 +74,23 @@
           </div>
         </div>
       </div>
+      <nav
+        class="pagination"
+        role="navigation"
+        aria-label="pagination"
+        v-if="hasSearchHappened"
+      >
+        <a
+          class="pagination-previous"
+          title="This is the first page"
+          :disabled="previousDisabled"
+          @click="previousPage"
+          >Previous</a
+        >
+        <a class="pagination-next" @click="nextPage" :disabled="nextDisabled"
+          >Next page</a
+        >
+      </nav>
     </div>
   </div>
 </template>
@@ -87,19 +104,22 @@ export default {
   name: "Home",
   data() {
     return {
+      hasSearchHappened: false,
       movieSearch: "",
       includeAdult: false,
       movieData: [],
       topMovieData: [],
       errFeedback: null,
       apiKey: process.env.VUE_APP_API_KEY,
+      currentPage: 1,
+      totalPages: null,
     };
   },
   methods: {
     getMovieByTitle() {
       axios
         .get(
-          `https://api.themoviedb.org/3/search/movie?api_key=${this.apiKey}&language=en-US&page=1&include_adult=${this.includeAdult}&query=${this.movieSearch}`
+          `https://api.themoviedb.org/3/search/movie?api_key=${this.apiKey}&language=en-US&page=${this.currentPage}&include_adult=${this.includeAdult}&query=${this.movieSearch}`
         )
         .then((response) => {
           if (response.data.Error) {
@@ -107,6 +127,9 @@ export default {
             this.errFeedback = "Your search didn't yeild any results";
           } else {
             this.movieData = response.data;
+            this.totalPages = response.data.total_pages;
+            this.hasSearchHappened = true;
+            console.log(this.totalPages);
             this.errFeedback = "";
             console.log(response.data);
           }
@@ -117,11 +140,36 @@ export default {
         title: newTitle,
         movieId: newId,
         poster_path: poster_path,
+        dateAdded: new Date(),
       });
 
       // this.favoriteMovies.some((title) => title.id === newId)
       //   ? null
       //   : this.favoriteMovies.push({ id: newId, title: newTitle });
+    },
+    nextPage() {
+      this.currentPage++;
+      this.getMovieByTitle();
+    },
+    previousPage() {
+      this.currentPage--;
+      this.getMovieByTitle();
+    },
+  },
+  computed: {
+    previousDisabled() {
+      if (this.currentPage == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    nextDisabled() {
+      if (this.currentPage == this.totalPages) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
 };

@@ -11,7 +11,16 @@
             <button @click="removeMovieFromFavorites(movie.id)">
               X
             </button>
-            <button @click="addToJournal(movie.id, movie.title, movie.poster_path)">
+            <button
+              @click="
+                addToJournal(
+                  movie.id,
+                  movie.title,
+                  movie.poster_path,
+                  movie.dateAdded
+                )
+              "
+            >
               Watched
             </button>
 
@@ -74,15 +83,18 @@ export default {
           });
         });
     },
-    addToJournal(newId, newTitle, poster_path) {
+    addToJournal(newId, newTitle, poster_path, date_added) {
       db.collection("movieJournal").add({
         title: newTitle,
         movieId: newId,
         poster_path: poster_path,
+        date_added: date_added,
       });
+      // this.removeMovieFromFavorites(newId);
     },
     getAllFavoriteMovies() {
       db.collection("favoriteMovies")
+        .orderBy("dateAdded")
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
@@ -92,6 +104,7 @@ export default {
               poster_path: doc.data().poster_path,
               movieId: doc.data().movieId,
               genre: doc.data().genre,
+              dateAdded: doc.data().dateAdded,
             };
 
             this.favoriteMovies.push(movie);

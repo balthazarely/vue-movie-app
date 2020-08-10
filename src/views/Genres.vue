@@ -58,7 +58,7 @@
           <div class="column is-three-quarters">
             <div class="columns is-mobile is-multiline is-variable">
               <div
-                class="column is-3"
+                class="column is-3 is-one-third-mobile "
                 v-for="movie in movieData.results"
                 :key="movie.id"
               >

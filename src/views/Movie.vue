@@ -1,11 +1,21 @@
 <template>
   <section class="hero bg-container">
     <!-- <div class="hero overlay"></div> -->
-    <div class="hero-body" style="border: 2px solid blue">
+    <div
+      class="hero-body banner-image"
+      :style="{
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundImage: `linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.1)), url(https://image.tmdb.org/t/p/w200/${movieData.backdrop_path}) `,
+      }"
+    >
+      <!-- movieData.backdrop_path -->
       <div class="container">
         <h1 class="title">
           Hero title
         </h1>
+
         <div class="columns" style="border: 2px solid red">
           <div class="column is-one-third">
             <figure class="image is-2-by-3">
@@ -115,7 +125,7 @@ export default {
       )
       .then((response) => {
         this.movieCredits = response.data;
-        // console.log(this.movieCredits, "movie credits");
+        console.log(this.movieCredits, "movie credits");
       });
   },
   methods: {
@@ -124,6 +134,7 @@ export default {
         title: newTitle,
         movieId: newId,
         poster_path: poster_path,
+        dateAdded: new Date(),
       });
     },
     fetchData() {
@@ -133,7 +144,7 @@ export default {
         )
         .then((response) => {
           this.movieData = response.data;
-          // console.log(this.movieData);
+          console.log(this.movieData);
         });
 
       axios
@@ -161,13 +172,8 @@ export default {
   margin: 10px
   width: 120px
 
-.bg-container
-  // background-repeat: no-repeat
-  // background-size: cover
-  // background-position: center
-  // height: 100%
-  // width: 100%
-  // z-index: -0
+.hero-body
+
 
 .overlay
   width: 100%

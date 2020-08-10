@@ -2,6 +2,18 @@
   <div class="container is-fullhd">
     <div class="movie-list" v-for="movie in journaledMovies" :key="movie.id">
       {{ movie.title }}
+      <router-link
+        class="secondary-content"
+        v-bind:to="{
+          name: 'journal-edit',
+          params: { id: movie.id },
+        }"
+      >
+        <button>Edit</button></router-link
+      >
+      {{ movie.rating }}
+      <button @click="removeMovieFromJournal(movie.id)">x</button>
+      <div class="my-comments">{{ movie.myComments }}</div>
     </div>
   </div>
 </template>
@@ -10,20 +22,27 @@
 import "bulma/css/bulma.css";
 import axios from "axios";
 import db from "@/firebase/init";
+import StarRating from "vue-star-rating";
+
 export default {
   name: "about",
+  components: {
+    StarRating,
+  },
   data() {
     return {
       journaledMovies: [],
       apiKey: process.env.VUE_APP_API_KEY,
+      rating: null,
     };
   },
   created() {
-    this.getAllJournalovies();
+    this.getAllJournalMovies();
+    console.log(this.journaledMovies);
   },
 
   methods: {
-    getAllJournalovies() {
+    getAllJournalMovies() {
       db.collection("movieJournal")
         .get()
         .then((snapshot) => {
@@ -33,9 +52,25 @@ export default {
               id: doc.id,
               poster_path: doc.data().poster_path,
               movieId: doc.data().movieId,
+              rating: doc.data().rating,
+              myComments: doc.data().myComments,
+              // dateWatched: doc.data().dateWatched,
             };
 
             this.journaledMovies.push(movie);
+          });
+        });
+    },
+    removeMovieFromJournal(id) {
+      this.journaledMovies = this.journaledMovies.filter((movie) => {
+        return movie.movieId != id;
+      });
+      db.collection("movieJournal")
+        .doc(id)
+        .delete()
+        .then(() => {
+          this.journaledMovies = this.journaledMovies.filter((movie) => {
+            return movie.id != id;
           });
         });
     },
@@ -88,4 +123,7 @@ export default {
   z-index: 10
   right: 0px
   bottom: 0px
+
+.rating-wrapper
+    border: 2px solid red
 </style>

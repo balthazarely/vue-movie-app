@@ -2,7 +2,7 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/new-releases">New Releases</router-link> |
+      <router-link to="/new-releases">Popular</router-link> |
       <router-link to="/favorites">Watchlist</router-link> |
       <router-link to="/genres">By Genre</router-link> |
       <router-link to="/Journal">Journals</router-link>

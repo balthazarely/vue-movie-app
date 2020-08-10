@@ -5,6 +5,7 @@ import Movie from "../views/Movie.vue";
 import Favorites from "../views/Favorites.vue";
 import Genres from "../views/Genres.vue";
 import Journal from "../views/Journal.vue";
+import JournalEdit from "../views/JournalEdit.vue";
 
 Vue.use(VueRouter);
 
@@ -28,6 +29,11 @@ const routes = [
     path: "/journal",
     name: "Journal",
     component: Journal,
+  },
+  {
+    path: "/journal-edit/:id",
+    name: "journal-edit",
+    component: JournalEdit,
   },
   {
     // adding the parameter from the specific smoothie
