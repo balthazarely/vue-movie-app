@@ -1,5 +1,12 @@
 <template>
-  <div class="container is-fullhd">
+  <div class="hero main-container">
+    <div class="movie-theatre-wrapper">
+      <h1
+        class="title is-4 is-size-5-mobile has-text-white has-text-weight-bold"
+      >
+        Welcome to CineApp
+      </h1>
+    </div>
     <div class="notification">
       <div class="columns">
         <div class="column is-narrow">
@@ -220,4 +227,19 @@ export default {
   z-index: 10
   right: 0px
   bottom: 0px
+
+.main-container
+  background: white
+
+
+.movie-theatre-wrapper
+  width: 100%
+  height: 400px
+  background-position: right top 20px 10px
+  background-repeat: no-repeat
+  background-size: cover
+  background-image: linear-gradient(rgba(1, 40, 68 , .8), rgba(1, 40, 68 , .8)),  url("../assets/pulpfiction.jpg")
+  display: flex
+  justify-content: center
+  align-items: center
 </style>

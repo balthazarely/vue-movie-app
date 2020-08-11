@@ -1,8 +1,15 @@
 <template>
-  <section class="hero" style="background: red">
+  <section class="hero main-container">
+    <div class="movie-theatre-wrapper">
+      <h1
+        class="title is-4 is-size-5-mobile has-text-white has-text-weight-bold"
+      >
+        Check out recent popular movies!
+      </h1>
+    </div>
     <div class="hero-body">
-      <div class="container">
-        <h1 class="title">
+      <div class="image-container">
+        <h1 class="title is-1">
           Hero title
         </h1>
         <h2 class="subtitle">
@@ -56,14 +63,13 @@
                     params: { movie_id: movie.id },
                   }"
                 >
-                  {{ movie.title }}
+                  <h1 class="title is-5 is-size-6-mobile">
+                    {{ movie.title }}
+                  </h1>
                 </router-link>
               </div>
               <div class="subtitle is-6 movie-subtitle">
-                {{ movie.release_date }}
-              </div>
-              <div class="tags">
-                <span class="tag">One</span>
+                {{ trimeDate(movie.release_date) }}
               </div>
             </div>
           </div>
@@ -119,28 +125,28 @@ export default {
     },
 
     addMovieToFavorites(newId, newTitle, poster_path) {
-      db.collection("favoriteMovies").add({
-        title: newTitle,
-        movieId: newId,
-        poster_path: poster_path,
-        dateAdded: new Date(),
-      });
-      // const query = db
-      //   .collection("favoriteMovies")
-      //   .where("movieId", "==", newId)
-      //   .get()
-      //   .then((doc) => {
-      //     if (doc.docs.length >= 2) {
-      //       console.log("this already exisits");
-      //     } else {
-      //       db.collection("favoriteMovies").add({
-      //         title: newTitle,
-      //         movieId: newId,
-      //         poster_path: poster_path,
-      //         dateAdded: new Date(),
-      //       });
-      //     }
-      //   });
+      // db.collection("favoriteMovies").add({
+      //   title: newTitle,
+      //   movieId: newId,
+      //   poster_path: poster_path,
+      //   dateAdded: new Date(),
+      // });
+      const query = db
+        .collection("favoriteMovies")
+        .where("movieId", "==", newId)
+        .get()
+        .then((doc) => {
+          if (doc.docs.length >= 2) {
+            console.log("this already exisits");
+          } else {
+            db.collection("favoriteMovies").add({
+              title: newTitle,
+              movieId: newId,
+              poster_path: poster_path,
+              dateAdded: new Date(),
+            });
+          }
+        });
 
       console.log(newId);
     },
@@ -151,6 +157,12 @@ export default {
     previousPage() {
       this.currentPage--;
       this.fetchMovies();
+    },
+    trimeDate(date) {
+      let length = date.length;
+      let wantedLength = 6;
+      let math = length - wantedLength;
+      return date.slice(0, math);
     },
   },
   computed: {
@@ -185,3 +197,19 @@ export default {
   },
 };
 </script>
+
+<style lang="sass">
+.main-container
+  background: white
+
+.movie-theatre-wrapper
+  width: 100%
+  height: 200px
+  background-position: right top 20px 10px
+  background-repeat: no-repeat
+  background-size: cover
+  background-image: linear-gradient(rgba(1, 40, 68 , .8), rgba(1, 40, 68 , .8)),  url("../assets/pulpfiction.jpg")
+  display: flex
+  justify-content: center
+  align-items: center
+</style>

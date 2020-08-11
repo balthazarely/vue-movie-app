@@ -2,9 +2,9 @@
   <div class="container is-fullhd">
     <div class="notification">
       <div class="columns">
-        <div class="columns is-multiline is-variable is-3">
+        <div class="columns is-mobile is-multiline is-variable is-3">
           <div
-            class="column is-one-fifth-desktop  movie-card"
+            class="column is-3 is-one-third-mobile movie-card"
             v-for="movie in favoriteMovies"
             :key="movie.id"
           >
@@ -90,7 +90,7 @@ export default {
         poster_path: poster_path,
         date_added: date_added,
       });
-      // this.removeMovieFromFavorites(newId);
+      this.removeMovieFromFavorites(newId);
     },
     getAllFavoriteMovies() {
       db.collection("favoriteMovies")

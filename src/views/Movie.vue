@@ -1,23 +1,20 @@
 <template>
-  <section class="hero bg-container">
+  <section class=" bg-container">
     <!-- <div class="hero overlay"></div> -->
     <div
       class="hero-body banner-image"
       :style="{
+        height: '60vh',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
-        backgroundImage: `linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.1)), url(https://image.tmdb.org/t/p/w200/${movieData.backdrop_path}) `,
+        backgroundImage: `linear-gradient(rgba(${colorPallet.DarkMuted.r},${colorPallet.DarkMuted.g},${colorPallet.DarkMuted.b},0.6), rgba(${colorPallet.DarkMuted.r},${colorPallet.DarkMuted.g},${colorPallet.DarkMuted.b},1)), url(https://image.tmdb.org/t/p/w780/${movieData.backdrop_path}) `,
       }"
     >
       <!-- movieData.backdrop_path -->
       <div class="container">
-        <h1 class="title">
-          Hero title
-        </h1>
-
-        <div class="columns" style="border: 2px solid red">
-          <div class="column is-one-third">
+        <div class="columns is-mobile ">
+          <div class="column is-variable is-3-desktop is-mobile">
             <figure class="image is-2-by-3">
               <img
                 class="movie-cover"
@@ -27,66 +24,99 @@
               />
             </figure>
           </div>
-          <div class="column is-two-thirds">
-            <h1>{{ movieData.title }}</h1>
-            <h2>{{ movieData.tagline }}</h2>
-            <h2>{{ movieData.release_date }}</h2>
-            <h2>{{ movieData.runtime }}</h2>
-
-            <div class="genre" v-for="(genre, i) in movieData.genres" :key="i">
-              <div>{{ genre.name }}</div>
-            </div>
-            <p>{{ movieData.overview }}</p>
-
-            <button
-              class=""
-              @click="
-                addMovieToFavorites(
-                  movieData.id,
-                  movieData.title,
-                  movieData.poster_path
-                )
-              "
+          <div
+            class="column is-mobile is-multiline is-variable is-two-thirds is-mobile"
+          >
+            <h1
+              class="title is-3 is-size-4-mobile has-text-white has-text-left has-text-weight-bold"
             >
-              Add to Favorites
-            </button>
+              {{ movieData.title }}
+            </h1>
 
-            <!-- need to make this so that this is a vloop  -->
-
-            <carousel :perPage="4" class="carousel">
-              <slide
-                class="carousel-slide"
-                v-for="movie in similarMovieData"
-                :key="movie.id"
+            <h1
+              class="subtitle is-4 is-size-5-mobile has-text-white has-text-left has-text-weight-light"
+            >
+              {{ trimeDate(movieData.release_date) }}
+            </h1>
+            <div class="container has-text-left mb-5">
+              <button
+                @click="
+                  addMovieToFavorites(
+                    movieData.id,
+                    movieData.title,
+                    movieData.poster_path
+                  )
+                "
+                class="button is-success"
               >
-                <img
-                  class="movie-cover"
-                  v-bind:src="
-                    'https://image.tmdb.org/t/p/w200/' + movie.poster_path
-                  "
-                />
-                <router-link
-                  :to="{
-                    name: 'Movie',
-                    params: { movie_id: movie.id },
-                  }"
-                >
-                  {{ movie.title }}
-                </router-link>
-              </slide>
-            </carousel>
+                <span class="icon is-small">
+                  <i class="fas fa-check"></i>
+                </span>
+                <span>Save</span>
+              </button>
+            </div>
 
-            <!-- <div
-              class="cast"
-              v-for="actor in movieCredits.cast"
-              :key="actor.id"
+            <div class="genre-wrapper">
+              <div v-for="(genre, i) in movieData.genres" :key="i">
+                <span class="tag is-light genres">{{ genre.name }}</span>
+              </div>
+            </div>
+            <h2
+              class="subtitle is-5 is-size-4-mobile has-text-white has-text-left mt-5"
             >
-              <div>{{ actor.name }}</div>
-            </div> -->
+              {{ movieData.tagline }}
+            </h2>
+
+            <p class=" is-5 is-size-7-mobile has-text-white has-text-left mt-4">
+              {{ movieData.overview }}
+            </p>
           </div>
         </div>
       </div>
     </div>
+    <h1
+      class="similar-header"
+      :style="{
+        background: `rgba(${colorPallet.DarkMuted.r},${colorPallet.DarkMuted.g},${colorPallet.DarkMuted.b}, 1) `,
+      }"
+    >
+      Similar Movies
+    </h1>
+    <carousel
+      :perPageCustom="[
+        [600, 4],
+        [1024, 6],
+      ]"
+      class="carousel"
+      :style="{
+        background: `rgba(${colorPallet.DarkMuted.r},${colorPallet.DarkMuted.g},${colorPallet.DarkMuted.b}, 1) `,
+      }"
+    >
+      <slide
+        class="carousel-slide"
+        v-for="movie in similarMovieData"
+        :key="movie.id"
+      >
+        <img
+          class="movie-cover"
+          v-bind:src="'https://image.tmdb.org/t/p/w200/' + movie.poster_path"
+        />
+        <router-link
+          :to="{
+            name: 'Movie',
+            params: { movie_id: movie.id },
+          }"
+        >
+          <h1
+            class="title is-7 is-size-4-mobile has-text-white  has-text-weight-bold"
+          >
+            {{ movie.title }}
+          </h1>
+        </router-link>
+      </slide>
+    </carousel>
+
+    <div class="hero-body banner-image">THIS IS A PLACE</div>
   </section>
 </template>
 
@@ -95,6 +125,7 @@ import "bulma/css/bulma.css";
 import axios from "axios";
 import db from "@/firebase/init";
 import { Carousel, Slide } from "vue-carousel";
+import * as Vibrant from "node-vibrant";
 
 export default {
   name: "Movie",
@@ -109,6 +140,7 @@ export default {
       movieData: [],
       movieCredits: [],
       similarMovieData: [],
+      colorPallet: [],
     };
   },
   beforeRouteUpdate(to, from, next) {
@@ -118,6 +150,7 @@ export default {
   created() {
     console.log("hi");
     this.fetchData();
+
     // CREDITS
     axios
       .get(
@@ -145,6 +178,18 @@ export default {
         .then((response) => {
           this.movieData = response.data;
           console.log(this.movieData);
+        })
+        .then(() => {
+          Vibrant.from(
+            `https://image.tmdb.org/t/p/w185//${this.movieData.poster_path}`
+          )
+            .getPalette()
+            .then((palette) => {
+              this.colorPallet = palette;
+            })
+            .then(() => {
+              console.log(this.colorPallet, "color");
+            });
         });
 
       axios
@@ -159,6 +204,12 @@ export default {
           console.log(this.similarMovieData, " similar movies");
         });
     },
+    trimeDate(date) {
+      let length = date.length;
+      let wantedLength = 6;
+      let math = length - wantedLength;
+      return date.slice(0, math);
+    },
   },
 };
 </script>
@@ -172,7 +223,10 @@ export default {
   margin: 10px
   width: 120px
 
-.hero-body
+.similar-header
+  color: white
+  font-size: 20px
+  padding-top: 10px
 
 
 .overlay
@@ -187,6 +241,15 @@ export default {
 .carousel-slide
 
 .carousel
-  border: 2px solid red
   height: 300px
+
+.genre-wrapper
+  display: flex
+  justify-content: flex-start
+  align-items: center
+  flex-direction: row
+
+.genres
+  display: flex
+  margin: 0px 5px 0px 0px
 </style>

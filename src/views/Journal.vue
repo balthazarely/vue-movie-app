@@ -54,9 +54,7 @@ export default {
               movieId: doc.data().movieId,
               rating: doc.data().rating,
               myComments: doc.data().myComments,
-              // dateWatched: doc.data().dateWatched,
             };
-
             this.journaledMovies.push(movie);
           });
         });

@@ -24,6 +24,8 @@
     <button @click="updateRating()">
       Save
     </button>
+    <router-link to="/Journal" tag="button">Back</router-link>
+
     <star-rating v-model="rating"></star-rating> {{ rating }}
   </div>
 </template>

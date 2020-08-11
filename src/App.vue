@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div id="nav">
+      <div class="logo"><img id="logo" src="./assets/cine-app-logo.svg" /></div>
       <router-link to="/">Home</router-link> |
       <router-link to="/new-releases">Popular</router-link> |
       <router-link to="/favorites">Watchlist</router-link> |
@@ -10,6 +11,14 @@
     <router-view />
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {};
+  },
+};
+</script>
 
 <style lang="scss">
 #app {
@@ -22,14 +31,19 @@
 
 #nav {
   padding: 30px;
-
+  background: #012844;
+  color: white;
   a {
     font-weight: bold;
-    color: #2c3e50;
+    color: white;
 
     &.router-link-exact-active {
-      color: #42b983;
+      color: #3abac0;
     }
   }
+}
+
+#logo {
+  width: 60px;
 }
 </style>
