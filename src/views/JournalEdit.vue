@@ -1,32 +1,68 @@
 <template>
-  <div class="container is-fullhd">
-    {{ title }} |
-    {{ id }}
-    <!-- <div class="control">
-      <div class="select">
-        <select v-model="myRating" @click="addRating">
-          <option>Select rating</option>
-          <option>1 Star</option>
-          <option>2 Star</option>
-          <option>3 Star</option>
-          <option>4 Star</option>
-          <option>5 Star</option>
-        </select>
-      </div>
-    </div> -->
+  <div class="container">
+    <div class="notification ">
+      <div class="columns ">
+        <div class="column image-col">
+          <figure class="image">
+            <img
+              style="max-height: 300px; max-width: 200px"
+              v-bind:src="'https://image.tmdb.org/t/p/w200/' + poster_path"
+            />
+          </figure>
+          <p class="title is-5 is-size-5-mobile has-text-center mt-5">
+            {{ title }}
+          </p>
+        </div>
+        <div class="column is-three-quarters">
+          <div class="field">
+            <label class="label has-text-left">Notes</label>
+            <div class="control ">
+              <textarea
+                class="textarea"
+                rows="10"
+                v-model="myComments"
+              ></textarea>
+            </div>
+            <div class="star-container">
+              <div style="display: flex">
+                <p class="subtitle is-5 is-size-5-mobile has-text-left mt-5">
+                  My rating:
+                </p>
+                <star-rating
+                  v-model="rating"
+                  active-color="#1DA6A2"
+                  v-bind:star-size="30"
+                  v-bind:show-rating="false"
+                ></star-rating>
+              </div>
 
-    <div class="field">
-      <label class="label">Message</label>
-      <div class="control">
-        <textarea class="textarea" v-model="myComments"></textarea>
+              <div class="date-wrapper" style="display: flex">
+                <label for="start">Watch date:</label>
+                <input
+                  style="height: 20px"
+                  type="date"
+                  id="start"
+                  v-model="watchDate"
+                  name="trip-start"
+                  value=""
+                  min="2018-01-01"
+                  max=""
+                />
+              </div>
+            </div>
+          </div>
+
+          <router-link to="/Journal">
+            <button class="button is-warning " style="text-decoration: none;">
+              Back
+            </button></router-link
+          >
+          <button @click="updateRating()" class="button is-primary ">
+            Save
+          </button>
+        </div>
       </div>
     </div>
-    <button @click="updateRating()">
-      Save
-    </button>
-    <router-link to="/Journal" tag="button">Back</router-link>
-
-    <star-rating v-model="rating"></star-rating> {{ rating }}
   </div>
 </template>
 
@@ -46,6 +82,7 @@ export default {
       title: null,
       myComments: null,
       rating: 3,
+      watchDate: null,
     };
   },
   created() {
@@ -61,8 +98,10 @@ export default {
           console.log(snapshot.data());
           this.id = snapshot.data().movieId;
           this.title = snapshot.data().title;
+          this.poster_path = snapshot.data().poster_path;
           this.myComments = snapshot.data().myComments;
           this.rating = snapshot.data().rating;
+          this.watchDate = snapshot.data().watchDate;
         });
       console.log("Date Fetched");
     },
@@ -73,6 +112,7 @@ export default {
         .update({
           rating: this.rating,
           myComments: this.myComments,
+          watchDate: this.watchDate,
         })
         .then(() => {
           this.$router.push({
@@ -84,7 +124,7 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .movie-cover
   border-radius: 10px
 
@@ -132,4 +172,16 @@ export default {
 
 .rating-wrapper
     border: 2px solid red
+
+.image-col
+  display: flex
+  flex-direction: column
+
+.image
+    display: flex
+    justify-content: center
+
+.star-container
+    display: flex
+    justify-content: space-between
 </style>

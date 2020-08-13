@@ -1,61 +1,48 @@
 <template>
   <section class="hero main-container">
     <div class="movie-theatre-wrapper">
-      <h1
+      <p
         class="title is-4 is-size-5-mobile has-text-white has-text-weight-bold"
       >
         Check out recent popular movies!
-      </h1>
-    </div>
-    <div class="hero-body">
-      <div class="image-container">
-        <h1 class="title is-1">
-          Hero title
-        </h1>
-        <h2 class="subtitle">
-          Hero subtitle
-        </h2>
-
-        <div class="field">
-          <label class="label">Trending Timeframe</label>
-          <div class="control">
-            <div class="select">
-              <select v-model="filterBy">
-                <option>day</option>
-                <option>week</option>
-              </select>
-            </div>
+      </p>
+      <div class="field">
+        <label class="label has-text-white">Trending Timeframe</label>
+        <div class="control">
+          <div class="select">
+            <select v-model="filterBy">
+              <option>day</option>
+              <option>week</option>
+            </select>
           </div>
         </div>
+      </div>
+    </div>
 
+    <div class="container" else>
+      <div class="notification is-white">
         <div class="columns">
           <div class="columns is-mobile is-multiline is-variable is-3">
             <div
-              class="column  is-one-fifth-widescreen is-one-quarter-desktop is-one-third-tablet is-one-third-mobile movie-card"
+              class="column  is-one-fifth-widescreen is-one-third-mobile is-one-fifth-desktop is-one-quarter-tablet  movie-card"
               v-for="movie in topMovieData.results"
               :key="movie.id"
             >
-              <button
-                class="button is-success add-movie-btn"
-                @click="
-                  addMovieToFavorites(movie.id, movie.title, movie.poster_path)
-                "
+              <router-link
+                :to="{
+                  name: 'Movie',
+                  params: { movie_id: movie.id },
+                }"
               >
-                <span class="icon is-small">
-                  <i class="fas fa-check"></i>
-                </span>
-                <span>Save</span>
-              </button>
-
-              <figure class="image movie-image is-2-by-3">
-                <img
-                  class="movie-cover"
-                  v-bind:src="
-                    'https://image.tmdb.org/t/p/w200/' + movie.poster_path
-                  "
-                />
-                <div class="movie-rating">{{ movie.vote_average }}</div>
-              </figure>
+                <figure class="image movie-image is-2-by-3">
+                  <img
+                    class="movie-cover"
+                    v-bind:src="
+                      'https://image.tmdb.org/t/p/w200/' + movie.poster_path
+                    "
+                  />
+                </figure>
+              </router-link>
               <div class="title is-6 is-size-4-mobile movie-title">
                 <router-link
                   :to="{
@@ -63,9 +50,12 @@
                     params: { movie_id: movie.id },
                   }"
                 >
-                  <h1 class="title is-5 is-size-6-mobile">
+                  <p
+                    class="title is-6 is-size-6-mobile"
+                    style="text-decoration: none;"
+                  >
                     {{ movie.title }}
-                  </h1>
+                  </p>
                 </router-link>
               </div>
               <div class="subtitle is-6 movie-subtitle">
@@ -198,18 +188,24 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .main-container
   background: white
 
 .movie-theatre-wrapper
   width: 100%
   height: 200px
-  background-position: right top 20px 10px
+  background-position: top
   background-repeat: no-repeat
   background-size: cover
   background-image: linear-gradient(rgba(1, 40, 68 , .8), rgba(1, 40, 68 , .8)),  url("../assets/pulpfiction.jpg")
   display: flex
   justify-content: center
   align-items: center
+
+.add-movie-btn
+  z-index: 100
+  position: relative
+  left: 100px
+  top: 20px
 </style>

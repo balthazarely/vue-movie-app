@@ -25,7 +25,7 @@
             </figure>
           </div>
           <div
-            class="column is-mobile is-multiline is-variable is-two-thirds is-mobile"
+            class="column is-mobile is-multiline is-variable is-two-thirds is-mobile ml-5"
           >
             <h1
               class="title is-3 is-size-4-mobile has-text-white has-text-left has-text-weight-bold"
@@ -44,7 +44,9 @@
                   addMovieToFavorites(
                     movieData.id,
                     movieData.title,
-                    movieData.poster_path
+                    movieData.poster_path,
+                    movieData.overview,
+                    movieData.release_date
                   )
                 "
                 class="button is-success"
@@ -62,7 +64,7 @@
               </div>
             </div>
             <h2
-              class="subtitle is-5 is-size-4-mobile has-text-white has-text-left mt-5"
+              class="subtitle is-5 is-size-5-mobile has-text-white has-text-left mt-5"
             >
               {{ movieData.tagline }}
             </h2>
@@ -70,12 +72,22 @@
             <p class=" is-5 is-size-7-mobile has-text-white has-text-left mt-4">
               {{ movieData.overview }}
             </p>
+            <div class="cast-container   " style="display: flex; ">
+              <p
+                class=" title is-6 is-size-7-mobile has-text-white has-text-left mt-4 has-text-weight- "
+                style="margin: 0 5px"
+                v-for="actor in movieCredits"
+                :key="actor.cast_id"
+              >
+                <span> {{ actor.name }}</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <h1
-      class="similar-header"
+      class="similar-header "
       :style="{
         background: `rgba(${colorPallet.DarkMuted.r},${colorPallet.DarkMuted.g},${colorPallet.DarkMuted.b}, 1) `,
       }"
@@ -84,6 +96,7 @@
     </h1>
     <carousel
       :perPageCustom="[
+        [300, 4],
         [600, 4],
         [1024, 6],
       ]"
@@ -108,15 +121,13 @@
           }"
         >
           <h1
-            class="title is-7 is-size-4-mobile has-text-white  has-text-weight-bold"
+            class="title is-7 is-size-7-mobile has-text-white  has-text-weight-bold"
           >
             {{ movie.title }}
           </h1>
         </router-link>
       </slide>
     </carousel>
-
-    <div class="hero-body banner-image">THIS IS A PLACE</div>
   </section>
 </template>
 
@@ -126,6 +137,7 @@ import axios from "axios";
 import db from "@/firebase/init";
 import { Carousel, Slide } from "vue-carousel";
 import * as Vibrant from "node-vibrant";
+import firebase from "firebase";
 
 export default {
   name: "Movie",
@@ -141,6 +153,8 @@ export default {
       movieCredits: [],
       similarMovieData: [],
       colorPallet: [],
+      currentUser: false,
+      currentUserUID: false,
     };
   },
   beforeRouteUpdate(to, from, next) {
@@ -150,25 +164,41 @@ export default {
   created() {
     console.log("hi");
     this.fetchData();
-
-    // CREDITS
-    axios
-      .get(
-        `https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=${this.apiKey}`
-      )
-      .then((response) => {
-        this.movieCredits = response.data;
-        console.log(this.movieCredits, "movie credits");
-      });
+    this.getUser();
   },
   methods: {
-    addMovieToFavorites(newId, newTitle, poster_path) {
-      db.collection("favoriteMovies").add({
-        title: newTitle,
-        movieId: newId,
-        poster_path: poster_path,
-        dateAdded: new Date(),
-      });
+    getUser() {
+      if (firebase.auth().currentUser) {
+        this.isLoggedIn = true;
+        this.currentUser = firebase.auth().currentUser.email;
+        this.currentUserUID = firebase.auth().currentUser.uid;
+      }
+      console.log(this.currentUserUID, "logged in user");
+    },
+    addMovieToFavorites(newId, newTitle, poster_path, overview, release_date) {
+      if (this.currentUser == false) {
+        alert("Please login or register to add movies to a watchlist");
+      } else {
+        const query = db
+          .collection("favoriteMovies")
+          .where("movieId", "==", newId)
+          .get()
+          .then((doc) => {
+            if (doc.docs.length >= 1) {
+              console.log("this already exisits");
+            } else {
+              db.collection("favoriteMovies").add({
+                title: newTitle,
+                movieId: newId,
+                poster_path: poster_path,
+                overview: overview,
+                releaseDate: release_date,
+                dateAdded: new Date(),
+                userUID: this.currentUserUID,
+              });
+            }
+          });
+      }
     },
     fetchData() {
       axios
@@ -202,6 +232,15 @@ export default {
           // this.similarMovieData = array.splice(14 + 1, array.length - (14 + 1));
           this.similarMovieData = response.data.results;
           console.log(this.similarMovieData, " similar movies");
+        });
+
+      axios
+        .get(
+          `https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=${this.apiKey}`
+        )
+        .then((response) => {
+          this.movieCredits = response.data.cast.slice(0, 5);
+          console.log(this.movieCredits, "movie credits");
         });
     },
     trimeDate(date) {

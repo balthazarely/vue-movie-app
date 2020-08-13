@@ -6,6 +6,9 @@ import Favorites from "../views/Favorites.vue";
 import Genres from "../views/Genres.vue";
 import Journal from "../views/Journal.vue";
 import JournalEdit from "../views/JournalEdit.vue";
+import Login from "../views/Login.vue";
+import Register from "../views/Register.vue";
+import firebase from "firebase";
 
 Vue.use(VueRouter);
 
@@ -24,6 +27,16 @@ const routes = [
     path: "/genres",
     name: "Genres",
     component: Genres,
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register,
   },
   {
     path: "/journal",
